@@ -5,11 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cotizador KIU → WhatsApp</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
 </head>
 <body>
 
 <div class="sh-wrap">
   <div class="sh-hero">
+    <button class="btn-config" id="btnConfig" title="Configuración">⚙️</button>
     <div class="sh-badge">SATENA</div>
     <h1>Cotizador KIU</h1>
     <p>Pegue el texto copiado desde KIU para generar su cotización al instante.</p>
@@ -30,6 +33,31 @@
     <div class="sh-result placeholder" id="resultado">Aquí aparecerá la cotización generada...</div>
 
     <div class="sh-footer">Tarifa sujeta a cambios y disponibilidad al momento de emitir.</div>
+  </div>
+</div>
+
+<div class="sh-config-modal" id="configModal">
+  <div class="sh-config-panel">
+    <div class="sh-config-header">
+      <h2>⚙️ Configuración</h2>
+      <button class="sh-config-close" id="btnCerrarConfig">✕</button>
+    </div>
+    <div class="sh-config-body">
+      <p class="sh-config-desc">La TA se suma al total final sin desglosar.</p>
+      <label class="sh-config-label">Tiquetes One Way</label>
+      <div class="sh-config-row">
+        <span class="sh-config-prefix">$</span>
+        <input type="number" id="taOneWay" class="sh-config-input" value="30700" min="0">
+      </div>
+      <label class="sh-config-label">Round Trip / Conexiones / Open Jaw</label>
+      <div class="sh-config-row">
+        <span class="sh-config-prefix">$</span>
+        <input type="number" id="taRoundTrip" class="sh-config-input" value="49750" min="0">
+      </div>
+    </div>
+    <div class="sh-config-footer">
+      <button class="btn-primary" id="btnGuardarConfig">Guardar</button>
+    </div>
   </div>
 </div>
 

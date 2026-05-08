@@ -4,9 +4,12 @@ function generarCotizacion() {
   const segmentos = extraerSegmentos(texto);
   const tipo = detectarTipo(segmentos);
   const equipaje = extraerEquipaje(texto);
-  const total = extraerTotal(texto);
+  const totalNeto = extraerTotal(texto);
+  const config = cargarConfiguracion();
+  const ta = obtenerTA(tipo, config);
+  const totalConTA = totalNeto + ta;
 
-  const mensaje = generarMensaje(segmentos, tipo, equipaje, total);
+  const mensaje = generarMensaje(segmentos, tipo, equipaje, totalConTA);
 
   const el = document.getElementById("resultado");
   el.innerText = mensaje;
@@ -193,14 +196,14 @@ function extraerEquipaje(texto) {
 function extraerTotal(texto) {
   const totalMatch = texto.match(/TOTALS\s+\d+\s+(\d+)\s+(\d+)\s+\d+\s+(\d+)/);
 
-  if (!totalMatch) return "";
+  if (!totalMatch) return 0;
 
-  const total = parseInt(totalMatch[3]);
-  const formatoCOP = new Intl.NumberFormat("es-CO");
-  return formatoCOP.format(total);
+  return parseInt(totalMatch[3]);
 }
 
-function generarMensaje(segmentos, tipo, equipaje, total) {
+function generarMensaje(segmentos, tipo, equipaje, totalNumerico) {
+  const formatoCOP = new Intl.NumberFormat("es-CO");
+  const total = formatoCOP.format(totalNumerico);
   let msg = "";
 
   if (tipo === "unico" && segmentos.length === 1) {
@@ -282,6 +285,51 @@ function copiarTexto() {
     }, 1800);
   });
 }
+
+function cargarConfiguracion() {
+  const guardados = localStorage.getItem("taConfig");
+  if (guardados) {
+    return JSON.parse(guardados);
+  }
+  return { taOneWay: 30700, taRoundTrip: 49750 };
+}
+
+function guardarConfiguracion() {
+  const taOneWay = parseInt(document.getElementById("taOneWay").value) || 0;
+  const taRoundTrip = parseInt(document.getElementById("taRoundTrip").value) || 0;
+  const config = { taOneWay, taRoundTrip };
+  localStorage.setItem("taConfig", JSON.stringify(config));
+  document.getElementById("configModal").classList.remove("active");
+}
+
+function obtenerTA(tipo, config) {
+  if (tipo === "unico") {
+    return config.taOneWay;
+  }
+  return config.taRoundTrip;
+}
+
+function abrirConfiguracion() {
+  const config = cargarConfiguracion();
+  document.getElementById("taOneWay").value = config.taOneWay;
+  document.getElementById("taRoundTrip").value = config.taRoundTrip;
+  document.getElementById("configModal").classList.add("active");
+}
+
+function cerrarConfiguracion() {
+  document.getElementById("configModal").classList.remove("active");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("btnConfig").addEventListener("click", abrirConfiguracion);
+  document.getElementById("btnCerrarConfig").addEventListener("click", cerrarConfiguracion);
+  document.getElementById("btnGuardarConfig").addEventListener("click", guardarConfiguracion);
+  document.getElementById("configModal").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("configModal")) {
+      cerrarConfiguracion();
+    }
+  });
+});
 
 const ciudades = {
   BOG: { ciudad: "Bogotá", aeropuerto: "Terminal Puente Aéreo" },
