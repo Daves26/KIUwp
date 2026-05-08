@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+* { box-sizing:border-box; margin:0; padding:0 }
+
+.sh-wrap {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #ffffff;
+  min-height: 600px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.sh-hero {
+  background: #1b1938;
+  padding: 40px 40px 36px;
+}
+
+.sh-hero h1 {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 0.96;
+  color: rgba(255,255,255,0.95);
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.sh-hero p {
+  font-size: 15px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 400;
+  margin-top: 10px;
+}
+
+.sh-badge {
+  display: inline-block;
+  background: #cbb7fb;
+  color: #26215c;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 8px;
+  letter-spacing: 0.3px;
+  margin-bottom: 16px;
+}
+
+.sh-body {
+  padding: 32px 40px 40px;
+}
+
+.sh-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.sh-textarea {
+  width: 100%;
+  height: 200px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid #dcd7d3;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  resize: vertical;
+  color: #292827;
+  background: #fff;
+  outline: none;
+  transition: border 0.15s;
+}
+
+.sh-textarea:focus {
+  border-color: #714cb6;
+}
+
+.sh-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: #292827;
+  color: #fff;
+  border: none;
+  padding: 11px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  transition: opacity 0.15s;
+}
+
+.btn-primary:hover {
+  opacity: 0.85;
+}
+
+.btn-copy {
+  background: #e9e5dd;
+  color: #292827;
+  border: none;
+  padding: 11px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  transition: background 0.15s;
+}
+
+.btn-copy:hover {
+  background: #ddd9d0;
+}
+
+.sh-divider {
+  height: 1px;
+  background: #dcd7d3;
+  margin: 28px 0;
+}
+
+.sh-result-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.sh-result {
+  background: #f7f6f3;
+  border: 1px solid #dcd7d3;
+  border-radius: 8px;
+  padding: 20px 22px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #292827;
+  white-space: pre-line;
+  min-height: 100px;
+}
+
+.sh-result.placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+.sh-footer {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.accent-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #cbb7fb;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}

@@ -1,0 +1,65 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  .sh-wrap{font-family:'Inter',system-ui,sans-serif;background:#ffffff;min-height:600px;border-radius:12px;overflow:hidden}
+  .sh-hero{background:#1b1938;padding:40px 40px 36px}
+  .sh-hero h1{font-size:32px;font-weight:600;line-height:0.96;color:rgba(255,255,255,0.95);letter-spacing:-0.5px;margin-bottom:8px}
+  .sh-hero p{font-size:15px;color:rgba(255,255,255,0.6);font-weight:400;margin-top:10px}
+  .sh-badge{display:inline-block;background:#cbb7fb;color:#26215c;font-size:11px;font-weight:700;padding:3px 10px;border-radius:8px;letter-spacing:0.3px;margin-bottom:16px}
+  .sh-body{padding:32px 40px 40px}
+  .sh-label{font-size:12px;font-weight:600;color:#888;letter-spacing:0.6px;text-transform:uppercase;margin-bottom:8px}
+  .sh-textarea{width:100%;height:200px;padding:14px 16px;border-radius:8px;border:1px solid #dcd7d3;font-family:'Courier New',monospace;font-size:13px;resize:vertical;color:#292827;background:#fff;outline:none;transition:border .15s}
+  .sh-textarea:focus{border-color:#714cb6}
+  .sh-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  .btn-primary{background:#292827;color:#fff;border:none;padding:11px 22px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:500;font-family:'Inter',sans-serif;transition:opacity .15s}
+  .btn-primary:hover{opacity:0.85}
+  .btn-copy{background:#e9e5dd;color:#292827;border:none;padding:11px 22px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:500;font-family:'Inter',sans-serif;transition:background .15s}
+  .btn-copy:hover{background:#ddd9d0}
+  .sh-divider{height:1px;background:#dcd7d3;margin:28px 0}
+  .sh-result-label{font-size:12px;font-weight:600;color:#888;letter-spacing:0.6px;text-transform:uppercase;margin-bottom:12px}
+  .sh-result{background:#f7f6f3;border:1px solid #dcd7d3;border-radius:8px;padding:20px 22px;font-family:'Courier New',monospace;font-size:13px;line-height:1.7;color:#292827;white-space:pre-line;min-height:100px}
+  .sh-result.placeholder{color:#aaa;font-style:italic}
+  .sh-footer{font-size:12px;color:#aaa;margin-top:20px;text-align:center}
+  .accent-dot{display:inline-block;width:6px;height:6px;background:#cbb7fb;border-radius:50%;margin-right:6px;vertical-align:middle}
+</style>
+
+<div class="sh-wrap">
+  <div class="sh-hero">
+    <div class="sh-badge">✦ 9R Aerolíneas</div>
+    <h1>Cotizador KIU<br>→ WhatsApp</h1>
+    <p>Pegue el texto copiado desde KIU para generar su cotización al instante.</p>
+  </div>
+
+  <div class="sh-body">
+    <div class="sh-label">Texto de KIU</div>
+    <textarea class="sh-textarea" id="inputKIU" placeholder="Pegue aquí el texto copiado desde el sistema KIU..."></textarea>
+
+    <div class="sh-actions">
+      <button class="btn-primary" onclick="generarCotizacion()">Generar cotización</button>
+      <button class="btn-copy" onclick="copiarTexto()">Copiar mensaje</button>
+    </div>
+
+    <div class="sh-divider"></div>
+
+    <div class="sh-result-label"><span class="accent-dot"></span>Resultado</div>
+    <div class="sh-result placeholder" id="resultado">Aquí aparecerá la cotización generada...</div>
+
+    <div class="sh-footer">Tarifa sujeta a cambios y disponibilidad al momento de emitir.</div>
+  </div>
+</div>
+
+<script>
+function formatearCiudad(c){const d=ciudades[c];return d?`${d.ciudad} (${c})`:c}
+function formatearFecha(d,m,a){return`${d} ${m} ${2000+a}`}
+function calcularTiempoConexion(l,s){const[h1,m1]=l.split(':').map(Number),[h2,m2]=s.split(':').map(Number);let diff=(h2*60+m2)-(h1*60+m1);if(diff<0)diff+=1440;return`${Math.floor(diff/60)}h ${diff%60}min`}
+function agregarSegmento(segs,o,d,sal,ll,fecha,dia,mes,anio){const s={origen:o,destino:d,origenCiudad:formatearCiudad(o),destinoCiudad:formatearCiudad(d),fecha,dia,mes,anio,salida:sal,llegada:ll};if(!segs.some(x=>x.origen===o&&x.destino===d&&x.salida===sal&&x.llegada===ll&&x.fecha===fecha))segs.push(s)}
+function extraerSegmentos(texto){const segs=[];const bloques=texto.split(/\*\*\s*KIU\s*AVAILABILITY\s*\*\*/i);for(let b=1;b<bloques.length;b++){const bl=bloques[b];if(bl.includes('TOTALS')&&bl.includes('FARE (IN COP)')&&!bl.match(/\d+\s+9R\s+\d+\s+[^\n]+\s+[A-Z]{3}\s+[A-Z]{3}\s+\d{2}:\d{2}\s+\d{2}:\d{2}/))continue;const fm=bl.match(/(MON|TUE|WED|THU|FRI|SAT|SUN)\s+(\d{2})([A-Z]{3})(\d{2})/);if(!fm)continue;const fecha=formatearFecha(fm[2],fm[3],parseInt(fm[4])),dia=parseInt(fm[2]),mes=fm[3],anio=2000+parseInt(fm[4]);const ss1=bl.match(/(?:^|\n)\s*\d+\s+9R[A-Z0-9]+\s+\d+[A-Z]{3}\s+[A-Z]{2}\s+([A-Z]{3})([A-Z]{3})\s+SS1\s+\d{4}\s+\d{4}/gm);const todas=bl.match(/(?:^|\n)\s*\d*\s*9R\s+\d+\s+[^\n]+\s+([A-Z]{3})\s+([A-Z]{3})\s+\d{2}:\d{2}\s+\d{2}:\d{2}/gm);if(ss1){for(const r of ss1){const m=r.match(/\d+\s+9R[A-Z0-9]+\s+\d+[A-Z]{3}\s+[A-Z]{2}\s+([A-Z]{3})([A-Z]{3})\s+SS1\s+(\d{4})\s+(\d{4})/);if(m&&/^[A-Z]{3}$/.test(m[1])&&/^[A-Z]{3}$/.test(m[2]))agregarSegmento(segs,m[1],m[2],m[3].substring(0,2)+':'+m[3].substring(2),m[4].substring(0,2)+':'+m[4].substring(2),fecha,dia,mes,anio)}}else if(todas){for(const r of todas){const m=r.match(/(?:^|\n)\s*\d+\s+9R\s+\d+\s+[^\n]+\s+([A-Z]{3})\s+([A-Z]{3})\s+(\d{2}:\d{2})\s+(\d{2}:\d{2})/);if(m&&/^[A-Z]{3}$/.test(m[1])&&/^[A-Z]{3}$/.test(m[2]))agregarSegmento(segs,m[1],m[2],m[3],m[4],fecha,dia,mes,anio)}}}return segs}
+function detectarTipo(s){if(s.length<=1)return'unico';const f0=`${s[0].anio}-${s[0].mes}-${s[0].dia}`;for(let i=1;i<s.length;i++){if(`${s[i].anio}-${s[i].mes}-${s[i].dia}`!==f0)return'tramos'}for(let i=0;i<s.length-1;i++){if(s[i].destino!==s[i+1].origen)return'tramos'}return'conexion'}
+function extraerEquipaje(texto){const all=texto.match(/(\d+)P\s+UP TO\s+([\d\.]+)(KG|K)/gi);if(!all||!all.length)return{menorPeso:null,todos:[]};const pesos=all.map(e=>{const m=e.match(/(\d+)P\s+UP TO\s+([\d\.]+)/);return m?parseFloat(m[2]):null}).filter(Boolean);return{menorPeso:pesos.length?Math.min(...pesos):null,todos:pesos}}
+function extraerTotal(texto){const m=texto.match(/TOTALS\s+\d+\s+(\d+)\s+(\d+)\s+\d+\s+(\d+)/);if(!m)return'';return new Intl.NumberFormat('es-CO').format(parseInt(m[3]))}
+function generarMensaje(segs,tipo,equipaje,total){let msg='COTIZACIÓN DE VUELO\n\n';const eq=equipaje.menorPeso?`Hasta ${equipaje.menorPeso}kg en bodega y 5kg en el artículo personal\n\n`:`Equipaje incluido\n\n`;if(tipo==='unico'&&segs.length===1){const s=segs[0];msg+=`Ruta: ${s.origenCiudad} → ${s.destinoCiudad}\nFecha: ${s.fecha}\n\nHorario:\nSale: ${s.salida}\nLlega: ${s.llegada}\n\nEquipaje:\n${eq}TOTAL POR PERSONA:\n$${total} COP\n\nTarifa sujeta a cambios y disponibilidad al momento de emitir.`}else if(tipo==='conexion'){const p=segs[0],u=segs[segs.length-1],n=segs.length-1;msg+=`Ruta: ${p.origenCiudad} → ${u.destinoCiudad}\nFecha: ${p.fecha}\n\nVuelo en conexión (${n} ${n===1?'escala':'escalas'})\n\nEscalas:\n`;segs.forEach((s,i)=>{msg+=`  ${i+1}. ${s.origenCiudad} → ${s.destinoCiudad} | ${s.salida} - ${s.llegada}\n`});if(segs.length>1)msg+=`\nConexión en ${formatearCiudad(segs[0].destino)}: ${calcularTiempoConexion(segs[0].llegada,segs[1].salida)}\n`;msg+=`\nEquipaje:\n${eq}TOTAL POR PERSONA:\n$${total} COP\n\nTarifa sujeta a cambios y disponibilidad al momento de emitir.`}else{segs.forEach((s,i)=>{msg+=`TRAMO ${i+1}:\nRuta: ${s.origenCiudad} → ${s.destinoCiudad}\nFecha: ${s.fecha}\nSale: ${s.salida} | Llega: ${s.llegada}\n\n`});msg+=`Equipaje:\n${eq}TOTAL POR PERSONA:\n$${total} COP\n\nTarifa sujeta a cambios y disponibilidad al momento de emitir.`}return msg}
+function generarCotizacion(){const texto=document.getElementById('inputKIU').value;const segs=extraerSegmentos(texto);const tipo=detectarTipo(segs);const eq=extraerEquipaje(texto);const total=extraerTotal(texto);const msg=generarMensaje(segs,tipo,eq,total);const el=document.getElementById('resultado');el.innerText=msg;el.classList.remove('placeholder')}
+function copiarTexto(){const t=document.getElementById('resultado').innerText;if(t==='Aquí aparecerá la cotización generada...')return;navigator.clipboard.writeText(t).then(()=>{const b=document.querySelector('.btn-copy');const orig=b.innerText;b.innerText='¡Copiado!';setTimeout(()=>{b.innerText=orig},1800)})}
+const ciudades={"BOG":{ciudad:"Bogotá"},"EOH":{ciudad:"Medellín"},"CLO":{ciudad:"Cali"},"BAQ":{ciudad:"Barranquilla"},"CTG":{ciudad:"Cartagena"},"BGA":{ciudad:"Bucaramanga"},"ADZ":{ciudad:"San Andrés"},"VUP":{ciudad:"Valledupar"},"MTR":{ciudad:"Montería"},"VVC":{ciudad:"Villavicencio"},"NVA":{ciudad:"Neiva"},"CUC":{ciudad:"Cúcuta"},"TCO":{ciudad:"Tumaco"},"IPI":{ciudad:"Ipiales"},"LET":{ciudad:"Leticia"},"PUU":{ciudad:"Puerto Asís"},"RCH":{ciudad:"Riohacha"},"PPN":{ciudad:"Popayán"},"UIB":{ciudad:"Quibdó"},"PEI":{ciudad:"Pereira"},"AXM":{ciudad:"Armenia"},"LMC":{ciudad:"La Macarena"},"FLA":{ciudad:"Florencia"},"YOP":{ciudad:"Yopal"},"MVP":{ciudad:"Mitú"},"SJE":{ciudad:"San José del Guaviare"},"PDA":{ciudad:"Puerto Inírida"},"PCR":{ciudad:"Puerto Carreño"},"PTX":{ciudad:"Pitalito"},"GPI":{ciudad:"Guapí"},"BSC":{ciudad:"Bahía Solano"},"NQU":{ciudad:"Nuquí"},"APO":{ciudad:"Apartadó"},"AUC":{ciudad:"Arauca"},"RVE":{ciudad:"Saravena"},"TME":{ciudad:"Tame"},"SVI":{ciudad:"San Vicente del Caguán"},"LQM":{ciudad:"Puerto Leguízamo"},"VGZ":{ciudad:"Villagarzón"},"BUN":{ciudad:"Buenaventura"},"TLU":{ciudad:"Tolú"},"PVA":{ciudad:"Providencia"},"SMR":{ciudad:"Santa Marta"},"CZU":{ciudad:"Corozal"},"IBU":{ciudad:"Ibagué"},"MDE":{ciudad:"Medellín"},"LPZ":{ciudad:"San Gil"},"OCV":{ciudad:"Ocaña"},"RON":{ciudad:"Paipa"},"MTB":{ciudad:"Montelibano"},"EBG":{ciudad:"El Bagre"},"CAQ":{ciudad:"Caucasia"},"COG":{ciudad:"Condoto"},"TBD":{ciudad:"Timbiquí"},"MMP":{ciudad:"Mompox"},"ACR":{ciudad:"Araracuara"},"HAY":{ciudad:"Aguachica"},"ACD":{ciudad:"Acandí"},"TIB":{ciudad:"Tibú"},"ECR":{ciudad:"El Charco"}};
+</script>
