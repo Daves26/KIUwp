@@ -263,37 +263,10 @@ function generarMensaje(segmentos, tipo, equipaje, total) {
     msg += `*$${total} COP*\n`;
     msg += `_(incluye tasas e impuestos)_\n\n`;
     msg += `⚠️ _Tarifa sujeta a cambios y disponibilidad al momento de emitir._\n\n`;
-    msg += `¿Me confirmas la reserva? 😊`;
+    msg += `¿Me confirmas la reserva?`;
   }
 
   return msg;
-}
-
-    mensaje += `\nEquipaje:\n`;
-    mensaje +=
-      equipaje.menorPeso
-        ? `Hasta ${equipaje.menorPeso}kg en bodega y 5kg en el artículo personal\n\n`
-        : `Equipaje incluido\n\n`;
-    mensaje += `TOTAL POR PERSONA:\n$${total} COP\n\n`;
-    mensaje += `Tarifa sujeta a cambios y disponibilidad al momento de emitir.`;
-  } else if (tipo === "tramos") {
-    segmentos.forEach((seg, i) => {
-      mensaje += `TRAMO ${i + 1}:\n`;
-      mensaje += `Ruta: ${seg.origenCiudad} → ${seg.destinoCiudad}\n`;
-      mensaje += `Fecha: ${seg.fecha}\n`;
-      mensaje += `Sale: ${seg.salida} | Llega: ${seg.llegada}\n\n`;
-    });
-
-    mensaje += `Equipaje:\n`;
-    mensaje +=
-      equipaje.menorPeso
-        ? `Hasta ${equipaje.menorPeso}kg en bodega y 5kg en el artículo personal\n\n`
-        : `Equipaje incluido\n\n`;
-    mensaje += `TOTAL POR PERSONA:\n$${total} COP\n\n`;
-    mensaje += `Tarifa sujeta a cambios y disponibilidad al momento de emitir.`;
-  }
-
-  return mensaje;
 }
 
 function copiarTexto() {
