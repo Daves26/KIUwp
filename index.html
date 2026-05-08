@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cotizador KIU → WhatsApp</title>
+
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#f4f6f9;
+      margin:0;
+      padding:30px;
+      color:#222;
+    }
+
+    .container{
+      max-width:900px;
+      margin:auto;
+      background:white;
+      padding:25px;
+      border-radius:14px;
+      box-shadow:0 2px 10px rgba(0,0,0,.1);
+    }
+
+    h1{
+      margin-top:0;
+      color:#0b57d0;
+    }
+
+    textarea{
+      width:100%;
+      height:250px;
+      padding:15px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      font-family: Consolas, monospace;
+      font-size:14px;
+      resize:vertical;
+    }
+
+    button{
+      background:#0b57d0;
+      color:white;
+      border:none;
+      padding:12px 20px;
+      border-radius:8px;
+      cursor:pointer;
+      margin-top:15px;
+      font-size:16px;
+    }
+
+    button:hover{
+      background:#0846a8;
+    }
+
+    .resultado{
+      margin-top:25px;
+      background:#f7f9fc;
+      padding:20px;
+      border-radius:10px;
+      border:1px solid #dfe6f0;
+      white-space:pre-line;
+    }
+
+    .copiar{
+      background:#16a34a;
+      margin-left:10px;
+    }
+
+    .copiar:hover{
+      background:#12803a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>Cotizador KIU → WhatsApp</h1>
+
+  <p>
+    Pegue el texto copiado desde KIU:
+  </p>
+
+  <textarea id="inputKIU"></textarea>
+
+  <br>
+
+  <button onclick="generarCotizacion()">
+    Generar Cotización
+  </button>
+
+  <button class="copiar" onclick="copiarTexto()">
+    Copiar Mensaje
+  </button>
+
+  <div class="resultado" id="resultado">
+    Aquí aparecerá la cotización...
+  </div>
+
+</div>
+
+<script>
+
+function generarCotizacion() {
+  const texto = document.getElementById("inputKIU").value;
+
+  const segmentos = extraerSegmentos(texto);
+  const tipo = detectarTipo(segmentos);
+  const equipaje = extraerEquipaje(texto);
+  const total = extraerTotal(texto);
+  
+  const mensaje = generarMensaje(segmentos, tipo, equipaje, total);
+
+  document.getElementById("resultado").innerText = mensaje;
+}
+
+function formatearCiudad(codigo) {
+  const datos = ciudades[codigo];
+  if (datos) {
+    return `${datos.ciudad} (${codigo})`;
+  }
+  return codigo;
+}
+
+function formatearFecha(dia, mes, anioCorto) {
+  const anio = 2000 + anioCorto;
+  return `${dia} ${mes} ${anio}`;
+}
+
+function calcularTiempoConexion(llegada, salida) {
+  const [h1, m1] = llegada.split(':').map(Number);
+  const [h2, m2] = salida.split(':').map(Number);
+  
+  let minDiff = (h2 * 60 + m2) - (h1 * 60 + m1);
+  if (minDiff < 0) minDiff += 24 * 60;
+  
+  const h = Math.floor(minDiff / 60);
+  const m = minDiff % 60;
+  
+  return `${h}h ${m}min`;
+}
+
+function extraerSegmentos(texto) {
+  const segmentos = [];
+  
+  const patronBloque = /\*\*\s*KIU\s*AVAILABILITY\s*\*\*/i;
+  const bloquesKIU = texto.split(patronBloque);
+  
+  for (let b = 1; b < bloquesKIU.length; b++) {
+    const bloque = bloquesKIU[b];
+    
+    const tieneVuelos = bloque.match(/\d+\s+9R\s+\d+\s+[^\n]+\s+[A-Z]{3}\s+[A-Z]{3}\s+\d{2}:\d{2}\s+\d{2}:\d{2}/);
+    const esBloqueSoloTotales = bloque.includes('TOTALS') && bloque.includes('FARE (IN COP)');
+    
+    if (esBloqueSoloTotales && !tieneVuelos) {
+      continue;
+    }
+    
+    const fechaMatch = bloque.match(/(MON|TUE|WED|THU|FRI|SAT|SUN)\s+(\d{2})([A-Z]{3})(\d{2})/);
+    if (!fechaMatch) continue;
+    
+    const diaStr = fechaMatch[2];
+    const mes = fechaMatch[3];
+    const anioCorto = parseInt(fechaMatch[4]);
+    const anio = 2000 + anioCorto;
+    const fecha = formatearFecha(diaStr, mes, anioCorto);
+    const dia = parseInt(diaStr);
+    
+    const todasRutas = bloque.match(/(?:^|\n)\s*\d*\s*9R\s+\d+\s+[^\n]+\s+([A-Z]{3})\s+([A-Z]{3})\s+\d{2}:\d{2}\s+\d{2}:\d{2}/gm);
+    
+    const rutasSS1 = bloque.match(/(?:^|\n)\s*\d+\s+9R[A-Z0-9]+\s+\d+[A-Z]{3}\s+[A-Z]{2}\s+([A-Z]{3})([A-Z]{3})\s+SS1\s+\d{4}\s+\d{4}/gm);
+    
+    if (rutasSS1 && rutasSS1.length > 0) {
+      for (const ruta of rutasSS1) {
+        const match = ruta.match(/\d+\s+9R[A-Z0-9]+\s+\d+[A-Z]{3}\s+[A-Z]{2}\s+([A-Z]{3})([A-Z]{3})\s+SS1\s+(\d{4})\s+(\d{4})/);
+        if (match && /^[A-Z]{3}$/.test(match[1]) && /^[A-Z]{3}$/.test(match[2])) {
+          const salida = match[3].substring(0,2) + ':' + match[3].substring(2);
+          const llegada = match[4].substring(0,2) + ':' + match[4].substring(2);
+          agregarSegmento(segmentos, match[1], match[2], salida, llegada, fecha, dia, mes, anio);
+        }
+      }
+    } else if (todasRutas) {
+      for (const ruta of todasRutas) {
+        const match = ruta.match(/(?:^|\n)\s*\d+\s+9R\s+\d+\s+[^\n]+\s+([A-Z]{3})\s+([A-Z]{3})\s+(\d{2}:\d{2})\s+(\d{2}:\d{2})/);
+        if (match && /^[A-Z]{3}$/.test(match[1]) && /^[A-Z]{3}$/.test(match[2])) {
+          agregarSegmento(segmentos, match[1], match[2], match[3], match[4], fecha, dia, mes, anio);
+        }
+      }
+    }
+  }
+
+  return segmentos;
+}
+
+function agregarSegmento(segmentos, origen, destino, salida, llegada, fecha, dia, mes, anio) {
+  const seg = {
+    origen,
+    destino,
+    origenCiudad: formatearCiudad(origen),
+    destinoCiudad: formatearCiudad(destino),
+    fecha,
+    dia,
+    mes,
+    anio,
+    salida,
+    llegada
+  };
+  
+  const existe = segmentos.some(s => 
+    s.origen === seg.origen && 
+    s.destino === seg.destino && 
+    s.salida === seg.salida &&
+    s.llegada === seg.llegada &&
+    s.fecha === seg.fecha
+  );
+  
+  if (!existe) {
+    segmentos.push(seg);
+  }
+}
+
+function detectarTipo(segmentos) {
+  if (segmentos.length === 0) return 'unico';
+  if (segmentos.length === 1) return 'unico';
+
+  const primerFecha = `${segmentos[0].anio}-${segmentos[0].mes}-${segmentos[0].dia}`;
+  let mismaFecha = true;
+
+  for (let i = 1; i < segmentos.length; i++) {
+    const fechaActual = `${segmentos[i].anio}-${segmentos[i].mes}-${segmentos[i].dia}`;
+    if (fechaActual !== primerFecha) {
+      mismaFecha = false;
+      break;
+    }
+  }
+
+  if (!mismaFecha) return 'tramos';
+
+  for (let i = 0; i < segmentos.length - 1; i++) {
+    if (segmentos[i].destino !== segmentos[i + 1].origen) {
+      return 'tramos';
+    }
+  }
+
+  return 'conexion';
+}
+
+function extraerEquipaje(texto) {
+  const todosEquipajes = texto.match(/(\d+)P\s+UP TO\s+([\d\.]+)(KG|K)/gi);
+  
+  if (!todosEquipajes || todosEquipajes.length === 0) {
+    return { menorPeso: null, todos: [] };
+  }
+
+  const pesos = [];
+  for (const e of todosEquipajes) {
+    const match = e.match(/(\d+)P\s+UP TO\s+([\d\.]+)/);
+    if (match) {
+      pesos.push(parseFloat(match[2]));
+    }
+  }
+
+  return {
+    menorPeso: pesos.length > 0 ? Math.min(...pesos) : null,
+    todos: pesos
+  };
+}
+
+function extraerTotal(texto) {
+  const totalMatch = texto.match(/TOTALS\s+\d+\s+(\d+)\s+(\d+)\s+\d+\s+(\d+)/);
+  
+  if (!totalMatch) return "";
+  
+  const total = parseInt(totalMatch[3]);
+  const formatoCOP = new Intl.NumberFormat('es-CO');
+  return formatoCOP.format(total);
+}
+
+function generarMensaje(segmentos, tipo, equipaje, total) {
+  let mensaje = `COTIZACIÓN DE VUELO\n\n`;
+
+  if (tipo === 'unico' && segmentos.length === 1) {
+    const seg = segmentos[0];
+    mensaje += `Ruta: ${seg.origenCiudad} → ${seg.destinoCiudad}\n`;
+    mensaje += `Fecha: ${seg.fecha}\n\n`;
+    mensaje += `Horario:\n`;
+    mensaje += `Sale: ${seg.salida}\n`;
+    mensaje += `Llega: ${seg.llegada}\n\n`;
+    mensaje += `Equipaje:\n`;
+    mensaje += equipaje.menorPeso 
+      ? `Hasta ${equipaje.menorPeso}kg en bodega y 5kg en el articulo personal\n\n`
+      : `Equipaje incluido\n\n`;
+    mensaje += `TOTAL POR PERSONA:\n$${total} COP\n\n`;
+    mensaje += `Tarifa sujeta a cambios y disponibilidad al momento de emitir.`;
+
+  } else if (tipo === 'conexion') {
+    const primer = segmentos[0];
+    const ultimo = segmentos[segmentos.length - 1];
+    const numEscalas = segmentos.length - 1;
+
+    mensaje += `Ruta: ${primer.origenCiudad} → ${ultimo.destinoCiudad}\n`;
+    mensaje += `Fecha: ${primer.fecha}\n\n`;
+    mensaje += `Vuelo en conexión (${numEscalas} ${numEscalas === 1 ? 'escala' : 'escalas'})\n\n`;
+    mensaje += `Escalas:\n`;
+
+    segmentos.forEach((seg, i) => {
+      mensaje += `  ${i + 1}. ${seg.origenCiudad} → ${seg.destinoCiudad} | ${seg.salida} - ${seg.llegada}\n`;
+    });
+
+    if (segmentos.length > 1) {
+      const conexionPoint = segmentos[0].destino;
+      const tiempoConexion = calcularTiempoConexion(segmentos[0].llegada, segmentos[1].salida);
+      mensaje += `\nConexión en ${formatearCiudad(conexionPoint)}: ${tiempoConexion}\n`;
+    }
+
+    mensaje += `\nEquipaje:\n`;
+    mensaje += equipaje.menorPeso 
+      ? `Hasta ${equipaje.menorPeso}kg en bodega y 5kg en el articulo personal\n\n`
+      : `Equipaje incluido\n\n`;
+    mensaje += `TOTAL POR PERSONA:\n$${total} COP\n\n`;
+    mensaje += `Tarifa sujeta a cambios y disponibilidad al momento de emitir.`;
+
+  } else if (tipo === 'tramos') {
+    segmentos.forEach((seg, i) => {
+      mensaje += `TRAMO ${i + 1}:\n`;
+      mensaje += `Ruta: ${seg.origenCiudad} → ${seg.destinoCiudad}\n`;
+      mensaje += `Fecha: ${seg.fecha}\n`;
+      mensaje += `Sale: ${seg.salida} | Llega: ${seg.llegada}\n\n`;
+    });
+
+    mensaje += `Equipaje:\n`;
+    mensaje += equipaje.menorPeso 
+      ? `Hasta ${equipaje.menorPeso}kg en bodega y 5kg en el articulo personal\n\n`
+      : `Equipaje incluido\n\n`;
+    mensaje += `TOTAL POR PERSONA:\n$${total} COP\n\n`;
+    mensaje += `Tarifa sujeta a cambios y disponibilidad al momento de emitir.`;
+  }
+
+  return mensaje;
+}
+
+function copiarTexto() {
+  const texto = document.getElementById("resultado").innerText;
+  navigator.clipboard.writeText(texto);
+  alert("Mensaje copiado");
+}
+
+// MAPA: códigos IATA a ciudades y aeropuertos
+const ciudades = {
+  "BOG": { "ciudad": "Bogotá", "aeropuerto": "Terminal Puente Aéreo" },
+  "EOH": { "ciudad": "Medellín", "aeropuerto": "Olaya Herrera" },
+  "CLO": { "ciudad": "Cali", "aeropuerto": "Alfonso Bonilla Aragón" },
+  "BAQ": { "ciudad": "Barranquilla", "aeropuerto": "Ernesto Cortissoz" },
+  "CTG": { "ciudad": "Cartagena", "aeropuerto": "Rafael Núñez" },
+  "BGA": { "ciudad": "Bucaramanga", "aeropuerto": "Palonegro" },
+  "ADZ": { "ciudad": "San Andrés", "aeropuerto": "Gustavo Rojas Pinilla" },
+  "VUP": { "ciudad": "Valledupar", "aeropuerto": "Alfonso López" },
+  "MTR": { "ciudad": "Montería", "aeropuerto": "Los Garzones" },
+  "VVC": { "ciudad": "Villavicencio", "aeropuerto": "Vanguardia" },
+  "NVA": { "ciudad": "Neiva", "aeropuerto": "Benito Salas" },
+  "CUC": { "ciudad": "Cúcuta", "aeropuerto": "Camilo Daza" },
+  "TCO": { "ciudad": "Tumaco", "aeropuerto": "La Florida" },
+  "IPI": { "ciudad": "Ipiales", "aeropuerto": "San Luis" },
+  "LET": { "ciudad": "Leticia", "aeropuerto": "Alfredo Vásquez Cobo" },
+  "PUU": { "ciudad": "Puerto Asís", "aeropuerto": "Tres de Mayo" },
+  "RCH": { "ciudad": "Riohacha", "aeropuerto": "Almirante Padilla" },
+  "PPN": { "ciudad": "Popayán", "aeropuerto": "Guillermo León Valencia" },
+  "UIB": { "ciudad": "Quibdó", "aeropuerto": "El Caraño" },
+  "PEI": { "ciudad": "Pereira", "aeropuerto": "Matecaña" },
+  "AXM": { "ciudad": "Armenia", "aeropuerto": "El Edén" },
+  "LMC": { "ciudad": "La Macarena", "aeropuerto": "La Macarena" },
+  "FLA": { "ciudad": "Florencia", "aeropuerto": "Gustavo Artunduaga" },
+  "YOP": { "ciudad": "Yopal", "aeropuerto": "El Alcaraván" },
+  "MVP": { "ciudad": "Mitú", "aeropuerto": "Fabio Alberto León Bentley" },
+  "SJE": { "ciudad": "San José del Guaviare", "aeropuerto": "Jorge Enrique González" },
+  "PDA": { "ciudad": "Puerto Inírida", "aeropuerto": "César Gaviria Trujillo" },
+  "PCR": { "ciudad": "Puerto Carreño", "aeropuerto": "Germán Olano" },
+  "PTX": { "ciudad": "Pitalito", "aeropuerto": "Contador" },
+  "GPI": { "ciudad": "Guapí", "aeropuerto": "Juan Casoman" },
+  "BSC": { "ciudad": "Bahía Solano", "aeropuerto": "José Celestino Mutis" },
+  "NQU": { "ciudad": "Nuquí", "aeropuerto": "Reyes Murillo" },
+  "APO": { "ciudad": "Apartadó", "aeropuerto": "Antonio Roldán Betancourt" },
+  "AUC": { "ciudad": "Arauca", "aeropuerto": "Santiago Pérez Quiroz" },
+  "RVE": { "ciudad": "Saravena", "aeropuerto": "Los Colonizadores" },
+  "TME": { "ciudad": "Tame", "aeropuerto": "Gabriel Vargas Santos" },
+  "SVI": { "ciudad": "San Vicente del Caguán", "aeropuerto": "Eduardo Falla Solano" },
+  "LQM": { "ciudad": "Puerto Leguízamo", "aeropuerto": "Caucaya" },
+  "VGZ": { "ciudad": "Villagarzón", "aeropuerto": "Villagarzón" },
+  "BUN": { "ciudad": "Buenaventura", "aeropuerto": "Gerardo Tobar López" },
+  "TLU": { "ciudad": "Tolú", "aeropuerto": "Golfo de Morrosquillo" },
+  "PVA": { "ciudad": "Providencia", "aeropuerto": "El Embrujo" },
+  "LCR": { "ciudad": "La Chorrera", "aeropuerto": "La Chorrera" },
+  "LPD": { "ciudad": "La Pedrera", "aeropuerto": "La Pedrera" },
+  "TCD": { "ciudad": "Tarapacá", "aeropuerto": "Ipiranga" },
+  "SMR": { "ciudad": "Santa Marta", "aeropuerto": "Simón Bolívar" },
+  "CZU": { "ciudad": "Corozal", "aeropuerto": "Las Brujas" },
+  "IBU": { "ciudad": "Ibagué", "aeropuerto": "Perales" },
+  "MDE": { "ciudad": "Medellín", "aeropuerto": "José María Córdova" },
+  "LPZ": { "ciudad": "San Gil", "aeropuerto": "San Gil" },
+  "OCV": { "ciudad": "Ocaña", "aeropuerto": "Ocaña" },
+  "RON": { "ciudad": "Paipa", "aeropuerto": "Paipa" },
+  "MTB": { "ciudad": "Montelibano", "aeropuerto": "Montelibano" },
+  "EBG": { "ciudad": "El Bagre", "aeropuerto": "El Bagre" },
+  "CAQ": { "ciudad": "Caucasia", "aeropuerto": "Caucasia" },
+  "COG": { "ciudad": "Condoto", "aeropuerto": "Mandinga" },
+  "TBD": { "ciudad": "Timbiquí", "aeropuerto": "Timbiquí" },
+  "MMP": { "ciudad": "Mompox", "aeropuerto": "San Bernardo" },
+  "ACR": { "ciudad": "Araracuara", "aeropuerto": "Araracuara" },
+  "HAY": { "ciudad": "Aguachica", "aeropuerto": "Aguachica" },
+  "ACD": { "ciudad": "Acandí", "aeropuerto": "Acandí" },
+  "TIB": { "ciudad": "Tibú", "aeropuerto": "Tibú" },
+  "ECR": { "ciudad": "El Charco", "aeropuerto": "El Charco" }
+};
+
+</script>
+
+</body>
+</html>
