@@ -139,9 +139,25 @@ function formatearFecha(dia, mes, anioCorto) {
   return `${dia} ${mes} ${anio}`;
 }
 
-function calcularTiempoConexion(llegada, salida) {
-  const [h1, m1] = llegada.split(':').map(Number);
-  const [h2, m2] = salida.split(':').map(Number);
+function formatearFechaCompleta(dia, mes, anio) {
+  const meses = {
+    'JAN': 'enero', 'FEB': 'febrero', 'MAR': 'marzo',
+    'APR': 'abril', 'MAY': 'mayo', 'JUN': 'junio',
+    'JUL': 'julio', 'AUG': 'agosto', 'SEP': 'septiembre',
+    'OCT': 'octubre', 'NOV': 'noviembre', 'DEC': 'diciembre'
+  };
+  const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  
+  const mesNum = Object.keys(meses).indexOf(mes);
+  const fecha = new Date(anio, mesNum, parseInt(dia));
+  const diaSemana = diasSemana[fecha.getDay()];
+  
+  return `${diaSemana}, ${dia} de ${meses[mes]} de ${anio}`;
+}
+
+function calcularDuracionVuelo(salida, llegada) {
+  const [h1, m1] = salida.split(':').map(Number);
+  const [h2, m2] = llegada.split(':').map(Number);
   
   let minDiff = (h2 * 60 + m2) - (h1 * 60 + m1);
   if (minDiff < 0) minDiff += 24 * 60;
@@ -149,7 +165,19 @@ function calcularTiempoConexion(llegada, salida) {
   const h = Math.floor(minDiff / 60);
   const m = minDiff % 60;
   
-  return `${h}h ${m}min`;
+  if (h > 0 && m > 0) return `${h}h ${m}min`;
+  if (h > 0) return `${h}h`;
+  return `${m}min`;
+}
+
+function calcularDuracionTotal(segmentos) {
+  const primeraSalida = segmentos[0].salida;
+  const ultimaLlegada = segmentos[segmentos.length - 1].llegada;
+  return calcularDuracionVuelo(primeraSalida, ultimaLlegada);
+}
+
+function calcularTiempoConexion(llegada, salida) {
+  return calcularDuracionVuelo(llegada, salida);
 }
 
 function extraerSegmentos(texto) {
@@ -295,66 +323,71 @@ function extraerTotal(texto) {
 }
 
 function generarMensaje(segmentos, tipo, equipaje, total) {
-  let mensaje = `COTIZACIÓN DE VUELO\n\n`;
+  let msg = "";
 
-  if (tipo === 'unico' && segmentos.length === 1) {
+  if (tipo === "unico" && segmentos.length === 1) {
     const seg = segmentos[0];
-    mensaje += `Ruta: ${seg.origenCiudad} → ${seg.destinoCiudad}\n`;
-    mensaje += `Fecha: ${seg.fecha}\n\n`;
-    mensaje += `Horario:\n`;
-    mensaje += `Sale: ${seg.salida}\n`;
-    mensaje += `Llega: ${seg.llegada}\n\n`;
-    mensaje += `Equipaje:\n`;
-    mensaje += equipaje.menorPeso 
-      ? `Hasta ${equipaje.menorPeso}kg en bodega y 5kg en el articulo personal\n\n`
-      : `Equipaje incluido\n\n`;
-    mensaje += `TOTAL POR PERSONA:\n$${total} COP\n\n`;
-    mensaje += `Tarifa sujeta a cambios y disponibilidad al momento de emitir.`;
+    msg = `✈️ *COTIZACIÓN DE VUELO*\n\n`;
+    msg += `📍 *Ruta:* ${seg.origenCiudad} → ${seg.destinoCiudad}\n`;
+    msg += `📅 *Fecha:* ${formatearFechaCompleta(seg.dia, seg.mes, seg.anio)}\n\n`;
+    msg += `🕐 *Horario*\n`;
+    msg += `• Sale: ${seg.salida} (${seg.origen})\n`;
+    msg += `• Llega: ${seg.llegada} (${seg.destino})\n`;
+    msg += `• Duración: ${calcularDuracionVuelo(seg.salida, seg.llegada)} — vuelo directo\n\n`;
+    msg += `🧳 *Equipaje incluido*\n`;
+    if (equipaje.menorPeso) {
+      msg += `• Bodega: hasta ${equipaje.menorPeso} kg\n`;
+    }
+    msg += `• Artículo personal: hasta 5 kg\n\n`;
+    msg += `💰 *Total por persona*\n`;
+    msg += `*$${total} COP*\n`;
+    msg += `_(incluye tasas e impuestos)_\n\n`;
+    msg += `⚠️ _Tarifa sujeta a cambios y disponibilidad al momento de emitir._\n\n`;
+    msg += `¿Me confirmas la reserva? 😊`;
 
-  } else if (tipo === 'conexion') {
+  } else if (tipo === "conexion") {
     const primer = segmentos[0];
     const ultimo = segmentos[segmentos.length - 1];
-    const numEscalas = segmentos.length - 1;
 
-    mensaje += `Ruta: ${primer.origenCiudad} → ${ultimo.destinoCiudad}\n`;
-    mensaje += `Fecha: ${primer.fecha}\n\n`;
-    mensaje += `Vuelo en conexión (${numEscalas} ${numEscalas === 1 ? 'escala' : 'escalas'})\n\n`;
-    mensaje += `Escalas:\n`;
-
+    msg = `✈️ *COTIZACIÓN DE VUELO*\n\n`;
+    msg += `📍 *Ruta:* ${primer.origenCiudad} → ${ultimo.destinoCiudad}\n`;
+    msg += `📅 *Fecha:* ${formatearFechaCompleta(primer.dia, primer.mes, primer.anio)}\n\n`;
+    msg += `🕐 *Horario*\n`;
     segmentos.forEach((seg, i) => {
-      mensaje += `  ${i + 1}. ${seg.origenCiudad} → ${seg.destinoCiudad} | ${seg.salida} - ${seg.llegada}\n`;
+      msg += `• Tramo ${i+1}: ${seg.salida} → ${seg.llegada} (${calcularDuracionVuelo(seg.salida, seg.llegada)})\n`;
     });
-
-    if (segmentos.length > 1) {
-      const conexionPoint = segmentos[0].destino;
-      const tiempoConexion = calcularTiempoConexion(segmentos[0].llegada, segmentos[1].salida);
-      mensaje += `\nConexión en ${formatearCiudad(conexionPoint)}: ${tiempoConexion}\n`;
+    msg += `• Duración total: ${calcularDuracionTotal(segmentos)} — vuelo con conexión\n\n`;
+    msg += `🧳 *Equipaje incluido*\n`;
+    if (equipaje.menorPeso) {
+      msg += `• Bodega: hasta ${equipaje.menorPeso} kg\n`;
     }
+    msg += `• Artículo personal: hasta 5 kg\n\n`;
+    msg += `💰 *Total por persona*\n`;
+    msg += `*$${total} COP*\n`;
+    msg += `_(incluye tasas e impuestos)_\n\n`;
+    msg += `⚠️ _Tarifa sujeta a cambios y disponibilidad al momento de emitir._\n\n`;
+    msg += `¿Me confirmas la reserva? 😊`;
 
-    mensaje += `\nEquipaje:\n`;
-    mensaje += equipaje.menorPeso 
-      ? `Hasta ${equipaje.menorPeso}kg en bodega y 5kg en el articulo personal\n\n`
-      : `Equipaje incluido\n\n`;
-    mensaje += `TOTAL POR PERSONA:\n$${total} COP\n\n`;
-    mensaje += `Tarifa sujeta a cambios y disponibilidad al momento de emitir.`;
-
-  } else if (tipo === 'tramos') {
+  } else if (tipo === "tramos") {
+    msg = `✈️ *COTIZACIÓN DE VUELO*\n\n`;
     segmentos.forEach((seg, i) => {
-      mensaje += `TRAMO ${i + 1}:\n`;
-      mensaje += `Ruta: ${seg.origenCiudad} → ${seg.destinoCiudad}\n`;
-      mensaje += `Fecha: ${seg.fecha}\n`;
-      mensaje += `Sale: ${seg.salida} | Llega: ${seg.llegada}\n\n`;
+      msg += `📍 *Tramo ${i+1}:* ${seg.origenCiudad} → ${seg.destinoCiudad}\n`;
+      msg += `📅 *Fecha:* ${formatearFechaCompleta(seg.dia, seg.mes, seg.anio)}\n`;
+      msg += `🕐 ${seg.salida} - ${seg.llegada} (${calcularDuracionVuelo(seg.salida, seg.llegada)})\n\n`;
     });
-
-    mensaje += `Equipaje:\n`;
-    mensaje += equipaje.menorPeso 
-      ? `Hasta ${equipaje.menorPeso}kg en bodega y 5kg en el articulo personal\n\n`
-      : `Equipaje incluido\n\n`;
-    mensaje += `TOTAL POR PERSONA:\n$${total} COP\n\n`;
-    mensaje += `Tarifa sujeta a cambios y disponibilidad al momento de emitir.`;
+    msg += `🧳 *Equipaje incluido*\n`;
+    if (equipaje.menorPeso) {
+      msg += `• Bodega: hasta ${equipaje.menorPeso} kg\n`;
+    }
+    msg += `• Artículo personal: hasta 5 kg\n\n`;
+    msg += `💰 *Total por persona*\n`;
+    msg += `*$${total} COP*\n`;
+    msg += `_(incluye tasas e impuestos)_\n\n`;
+    msg += `⚠️ _Tarifa sujeta a cambios y disponibilidad al momento de emitir._\n\n`;
+    msg += `¿Me confirmas la reserva? 😊`;
   }
 
-  return mensaje;
+  return msg;
 }
 
 function generarCotizacion(texto) {
