@@ -1,0 +1,16 @@
+{
+  "name": "kiuwp",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cotizador KIU para WhatsApp",
+  "scripts": {
+    "lint": "eslint js/ test.js --fix",
+    "format": "prettier --write \"js/**/*.js\" test.js styles.css index.html",
+    "test": "node test.js"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0"
+  }
+}

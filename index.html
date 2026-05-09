@@ -1,67 +1,125 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cotizador KIU → WhatsApp</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-</head>
-<body>
-
-<div class="sh-wrap">
-  <div class="sh-hero">
-    <button class="btn-config" id="btnConfig" title="Configuración">⚙️</button>
-    <div class="sh-badge">SATENA</div>
-    <h1>Cotizador KIU</h1>
-    <p>Pegue el texto copiado desde KIU para generar su cotización al instante.</p>
-  </div>
-
-  <div class="sh-body">
-    <div class="sh-label">Texto de KIU</div>
-    <textarea class="sh-textarea" id="inputKIU" placeholder="Pegue aquí el texto copiado desde el sistema KIU..."></textarea>
-
-    <div class="sh-actions">
-      <button class="btn-primary" onclick="generarCotizacion()">Generar cotización</button>
-      <button class="btn-copy" onclick="copiarTexto()">Copiar mensaje</button>
-    </div>
-
-    <div class="sh-divider"></div>
-
-    <div class="sh-result-label"><span class="accent-dot"></span>Resultado</div>
-    <div class="sh-result placeholder" id="resultado">Aquí aparecerá la cotización generada...</div>
-
-    <div class="sh-footer">Tarifa sujeta a cambios y disponibilidad al momento de emitir.</div>
-  </div>
-</div>
-
-<div class="sh-config-modal" id="configModal">
-  <div class="sh-config-panel">
-    <div class="sh-config-header">
-      <h2>⚙️ Configuración</h2>
-      <button class="sh-config-close" id="btnCerrarConfig">✕</button>
-    </div>
-    <div class="sh-config-body">
-      <p class="sh-config-desc">La TA se suma al total final sin desglosar.</p>
-      <label class="sh-config-label">Tiquetes One Way</label>
-      <div class="sh-config-row">
-        <span class="sh-config-prefix">$</span>
-        <input type="number" id="taOneWay" class="sh-config-input" value="30700" min="0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#b0d4d0" />
+    <title>Cotizador KIU → WhatsApp</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="favicon_32.png" />
+  </head>
+  <body>
+    <div class="sh-wrap">
+      <div class="sh-hero">
+        <div class="sh-hero-actions">
+          <button
+            class="btn-icon"
+            id="btnDarkMode"
+            title="Cambiar tema"
+            aria-label="Cambiar entre modo claro y oscuro"
+          >
+            <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+            </svg>
+          </button>
+          <button
+            class="btn-icon"
+            id="btnConfig"
+            title="Configuración"
+            aria-label="Abrir configuración"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="7" x2="20" y2="7"/>
+              <circle cx="7" cy="7" r="2" fill="currentColor"/>
+              <circle cx="17" cy="7" r="2" fill="currentColor"/>
+              <line x1="4" y1="17" x2="20" y2="17"/>
+              <circle cx="12" cy="17" r="2" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+        <h1>Cotizador KIU</h1>
+        <p>Pegue el texto copiado desde KIU para generar su cotización al instante.</p>
       </div>
-      <label class="sh-config-label">Round Trip / Conexiones / Open Jaw</label>
-      <div class="sh-config-row">
-        <span class="sh-config-prefix">$</span>
-        <input type="number" id="taRoundTrip" class="sh-config-input" value="49750" min="0">
+
+      <div class="sh-body">
+        <div class="sh-panel-left">
+          <label class="sh-label" for="inputKIU">Texto de KIU</label>
+          <textarea
+            class="sh-textarea"
+            id="inputKIU"
+            placeholder="Pegue aquí el texto copiado desde el sistema KIU..."
+            aria-label="Texto copiado desde el sistema KIU"
+          ></textarea>
+
+          <div class="sh-actions">
+            <button class="btn-accent" onclick="generarCotizacion()">Generar cotización</button>
+          </div>
+        </div>
+
+        <div class="sh-divider"></div>
+
+        <div class="sh-panel-right">
+          <div class="sh-result-label"><span class="accent-dot"></span>Resultado</div>
+          <div class="sh-result placeholder" id="resultado" aria-live="polite">Aquí aparecerá la cotización generada...</div>
+          <div class="sh-copy-wrap">
+            <button
+              class="btn-secondary btn-copy"
+              onclick="copiarTexto()"
+              aria-label="Copiar mensaje al portapapeles"
+            >
+              Copiar mensaje
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sh-footer"></div>
+    </div>
+
+    <div
+      class="sh-config-modal"
+      id="configModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="configTitle"
+    >
+      <div class="sh-config-panel">
+        <div class="sh-config-header">
+          <h2 id="configTitle">⚙️ Configuración</h2>
+          <button class="sh-config-close" id="btnCerrarConfig" aria-label="Cerrar configuración">
+            ✕
+          </button>
+        </div>
+        <div class="sh-config-body">
+          <p class="sh-config-desc">La TA se suma al total final sin desglosar.</p>
+
+          <label class="sh-config-label" for="taOneWay">Tiquetes One Way</label>
+          <div class="sh-config-row">
+            <span class="sh-config-prefix">$</span>
+            <input type="number" id="taOneWay" class="sh-config-input" value="30700" min="0" />
+          </div>
+
+          <label class="sh-config-label" for="taRoundTrip"
+            >Round Trip / Conexiones / Open Jaw</label
+          >
+          <div class="sh-config-row">
+            <span class="sh-config-prefix">$</span>
+            <input type="number" id="taRoundTrip" class="sh-config-input" value="49750" min="0" />
+          </div>
+        </div>
+        <div class="sh-config-footer">
+          <button class="btn-primary" id="btnGuardarConfig">Guardar</button>
+        </div>
       </div>
     </div>
-    <div class="sh-config-footer">
-      <button class="btn-primary" id="btnGuardarConfig">Guardar</button>
-    </div>
-  </div>
-</div>
 
-<script src="script.js" defer></script>
-
-</body>
+    <script type="module" src="js/main.js"></script>
+  </body>
 </html>

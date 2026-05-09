@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Archivos temporales
+info.md
+*.log
+*.tmp
+*.bak
+temp.html
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+AGENTS.md
+DESIGn.md

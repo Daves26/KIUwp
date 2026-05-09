@@ -1,0 +1,28 @@
+{
+  "name": "Cotizador KIU → WhatsApp",
+  "short_name": "KIUwp",
+  "description": "Genera cotizaciones de vuelo desde KIU listas para WhatsApp",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1b1938",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "favicon_32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
