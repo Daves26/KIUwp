@@ -126,9 +126,9 @@ function generarCotizacion(texto) {
   const tipo = detectarTipo(segmentos);
   const equipaje = extraerEquipaje(texto);
   const total = extraerTotal(texto);
-  const ta = obtenerTA(tipo, config);
-  const totalConTA = total + ta;
   const pasajeros = extraerPasajeros(texto);
+  const ta = obtenerTA(tipo, config);
+  const totalConTA = total + ta * pasajeros;
 
   return {
     segmentos,

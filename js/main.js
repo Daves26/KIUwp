@@ -41,7 +41,7 @@ function generarCotizacion() {
   }
 
   const ta = obtenerTA(tipo, config);
-  const totalConTA = totalNeto + ta;
+  const totalConTA = totalNeto + ta * pasajeros;
   const mensaje = generarMensaje(segmentos, tipo, equipaje, totalConTA, pasajeros);
 
   resultado.innerText = mensaje;
