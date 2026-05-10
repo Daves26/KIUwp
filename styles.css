@@ -2,65 +2,65 @@
 @import url('https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5/index.css');
 
 :root {
-  --brand-green: #00d4a4;
-  --brand-green-deep: #00b48a;
-  --brand-green-soft: #7cebcb;
-  --brand-tag: #3772cf;
-  --brand-error: #d45656;
+  --brand: #5c5c5c;
+  --brand-deep: #424242;
+  --brand-soft: #9e9e9e;
+  --brand-tag: #5c5c5c;
+  --brand-error: #7a7a7a;
 
-  --canvas: #ffffff;
-  --surface: #f7f7f7;
-  --surface-soft: #fafafa;
-  --hairline: #e5e5e5;
-  --hairline-soft: #ededed;
+  --canvas: #fafafa;
+  --surface: #ebebeb;
+  --surface-soft: #f2f2f2;
+  --hairline: #c7c7c7;
+  --hairline-soft: #d6d6d6;
 
-  --ink: #0a0a0a;
-  --charcoal: #1c1c1e;
-  --slate: #3a3a3c;
-  --steel: #5a5a5c;
-  --stone: #888888;
-  --muted: #a8a8aa;
+  --ink: #000000;
+  --charcoal: #171717;
+  --slate: #2e2e2e;
+  --steel: #4a4a4a;
+  --stone: #5c5c5c;
+  --muted: #7a7a7a;
   --on-dark: #ffffff;
   --on-dark-muted: #b3b3b3;
 
-  --hero-sky-from: #b0d4d0;
-  --hero-sky-to: #dceee8;
+  --hero-sky-from: #c7c7c7;
+  --hero-sky-to: #d6d6d6;
 
   --hero-glass-bg: rgba(255, 255, 255, 0.12);
   --hero-glass-border: rgba(255, 255, 255, 0.2);
   --hero-noise-opacity: 0.04;
 
-  --primary: #0a0a0a;
+  --primary: #000000;
   --on-primary: #ffffff;
 
   --overlay: rgba(0, 0, 0, 0.4);
-  --error-bg: #fff0f0;
-  --error-border: #ffc0c0;
+  --error-bg: #ebebeb;
+  --error-border: #c7c7c7;
   --error-text: var(--brand-error);
-  --focus-ring: var(--brand-green);
+  --focus-ring: var(--brand);
 }
 
 [data-theme='dark'] {
-  --brand-green: #00d4a4;
-  --brand-green-deep: #00b48a;
+  --brand: #808080;
+  --brand-deep: #bdbdbd;
 
   --canvas: #0a0a0a;
-  --surface: #1c1c1e;
-  --surface-soft: #161616;
-  --hairline: #1f1f1f;
-  --hairline-soft: #2a2a2a;
+  --surface: #141414;
+  --surface-soft: #0f0f0f;
+  --hairline: #1a1a1a;
+  --hairline-soft: #242424;
 
   --ink: #ffffff;
-  --charcoal: #e0e0e0;
-  --slate: #a8a8aa;
-  --steel: #888888;
-  --stone: #6a6a6a;
-  --muted: #5a5a5c;
+  --charcoal: #cccccc;
+  --slate: #a0a0a0;
+  --steel: #808080;
+  --stone: #5c5c5c;
+  --muted: #4a4a4a;
   --on-dark: #ffffff;
   --on-dark-muted: #b3b3b3;
 
-  --hero-sky-from: #1a3d4a;
-  --hero-sky-to: #2d5a4f;
+  --hero-sky-from: #1a1a1a;
+  --hero-sky-to: #242424;
 
   --hero-glass-bg: rgba(255, 255, 255, 0.05);
   --hero-glass-border: rgba(255, 255, 255, 0.1);
@@ -69,9 +69,9 @@
   --on-primary: #0a0a0a;
 
   --overlay: rgba(0, 0, 0, 0.7);
-  --error-bg: #2a1010;
-  --error-border: #5a2020;
-  --error-text: #ff6b6b;
+  --error-bg: #1a1a1a;
+  --error-border: #333333;
+  --error-text: #808080;
 }
 
 html,
@@ -113,7 +113,7 @@ body {
     radial-gradient(ellipse 80% 60% at 0% 15%, var(--hero-sky-from) 0%, transparent 70%),
     radial-gradient(ellipse 60% 50% at 100% 85%, var(--hero-sky-to) 0%, transparent 70%),
     radial-gradient(ellipse 50% 40% at 50% 35%, color-mix(in srgb, var(--hero-sky-from) 25%, transparent) 0%, transparent 100%),
-    radial-gradient(ellipse 40% 30% at 50% 45%, color-mix(in srgb, var(--brand-green) 8%, transparent) 0%, transparent 100%),
+    radial-gradient(ellipse 40% 30% at 50% 45%, color-mix(in srgb, var(--brand) 8%, transparent) 0%, transparent 100%),
     linear-gradient(180deg, var(--hero-sky-from) 0%, var(--hero-sky-to) 100%);
   background-size: 120% 120%;
   transition: background 0.4s;
@@ -312,10 +312,10 @@ body {
   flex-wrap: wrap;
 }
 
-/* ── Accent Green Button (pill) ── */
+/* ── Accent Button (pill) ── */
 .btn-accent {
-  background: var(--brand-green-deep);
-  color: var(--ink);
+  background: var(--primary);
+  color: var(--on-primary);
   border: none;
   padding: 10px 20px;
   border-radius: 9999px;
@@ -328,7 +328,16 @@ body {
 }
 
 .btn-accent:hover {
-  background: var(--brand-green-deep);
+  background: var(--primary);
+}
+
+[data-theme='dark'] .btn-accent {
+  background: var(--on-dark);
+  color: var(--on-primary);
+}
+
+[data-theme='dark'] .btn-accent:hover {
+  background: var(--on-dark);
 }
 
 /* ── Primary Button (black pill) ── */
@@ -455,7 +464,7 @@ body {
   margin: 28px 0;
   background: linear-gradient(90deg,
     transparent 0%,
-    color-mix(in srgb, var(--brand-green) 40%, transparent) 50%,
+    color-mix(in srgb, var(--brand) 40%, transparent) 50%,
     transparent 100%
   );
   background-size: 200% 100%;
@@ -482,7 +491,7 @@ body {
   display: inline-block;
   width: 6px;
   height: 6px;
-  background: var(--brand-green);
+  background: var(--brand);
   border-radius: 50%;
   margin-right: 6px;
   vertical-align: middle;
@@ -517,7 +526,7 @@ body {
 }
 
 .sh-result.success {
-  border-color: var(--brand-green-deep);
+  border-color: var(--brand-deep);
 }
 
 .sh-result.error {
