@@ -1,4 +1,4 @@
-import { extraerSegmentos, detectarTipo, extraerEquipaje, extraerTotal } from './js/parser.js';
+import { extraerSegmentos, detectarTipo, extraerEquipaje, extraerTotal, extraerPasajeros } from './js/parser.js';
 import { generarMensaje } from './js/formatter.js';
 
 const input1 = `** KIU AVAILABILITY ** TO LPZ/SAN GIL, CO              MON 25MAY26
@@ -124,13 +124,15 @@ function generarCotizacion(texto) {
   const tipo = detectarTipo(segmentos);
   const equipaje = extraerEquipaje(texto);
   const total = extraerTotal(texto);
+  const pasajeros = extraerPasajeros(texto);
 
   return {
     segmentos,
     tipo,
     equipaje,
     total,
-    mensaje: generarMensaje(segmentos, tipo, equipaje, total),
+    pasajeros,
+    mensaje: generarMensaje(segmentos, tipo, equipaje, total, pasajeros),
   };
 }
 
@@ -146,6 +148,7 @@ function ejecutarPrueba(numero, nombre, input) {
   const resultado = generarCotizacion(input);
   console.log('Segmentos encontrados:', resultado.segmentos.length);
   console.log('Tipo:', resultado.tipo);
+  console.log('Pasajeros:', resultado.pasajeros);
   if (resultado.segmentos.length > 0) {
     resultado.segmentos.forEach((s, i) => {
       console.log(
@@ -163,15 +166,37 @@ function ejecutarPrueba(numero, nombre, input) {
   const checks = [];
   checks.push(resultado.segmentos.length > 0 ? '✓ Segmentos detectados' : '✗ Sin segmentos');
   checks.push(resultado.total > 0 ? '✓ Total extraído' : '✗ Total no extraído');
+  checks.push(resultado.pasajeros > 0 ? '✓ Pasajeros extraídos' : '✗ Pasajeros no extraídos');
   checks.push(resultado.mensaje.includes('COTIZACIÓN') ? '✓ Mensaje generado' : '✗ Mensaje vacío');
   console.log('');
   checks.forEach((c) => console.log(`  ${c}`));
 }
 
+const input5 = `** KIU AVAILABILITY ** TO EOH/MEDELLIN, CO             WED 13MAY26
+   1   9R    8840  Y5 B2 K1 M1 QC TC VC  LPZ   EOH     08:45   10:05   N   0 DH6 3    01:20
+                   D1 X1 O1 
+ 1* MORE CARRIER DISPLAY
+03Y1
+    1   9R8840Y 13MAY WE LPZEOH SS3  0845 1005
+WS
+FARE NOT GUARANTEED UNTIL TICKETED
+
+     PASSENGER           TYPE       FARE (IN COP)          TAX        FEE       PER PSGR
+  1. NO NAME ( 3)         ADT             1260000       272400          0        1532400
+                   TOTALS   3             1260000       272400          0        1532400
+
+BAGGAGE ALLOWANCE
+ADT
+ 9R    LPZMDE        2P  UP TO 10.00K
+
+
+FARED: LPZ009RJV 1449/10MAY26 # WS`;
+
 ejecutarPrueba(1, 'ONE WAY (EOH → LPZ)', input1);
 ejecutarPrueba(2, 'ROUND TRIP (EOH → LPZ + LPZ → EOH)', input2);
 ejecutarPrueba(3, 'MÚLTIPLES TRAYECTOS (3 TRAMOS)', input3);
 ejecutarPrueba(4, 'VUELO EN CONEXIÓN (LPZ → EOH → BOG)', input4);
+ejecutarPrueba(5, '3 PASAJEROS', input5);
 
 console.log('');
 console.log('✓ TODAS LAS PRUEBAS COMPLETADAS');

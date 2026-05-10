@@ -153,3 +153,19 @@ export function extraerTotal(texto) {
   if (!totalMatch) return 0;
   return parseInt(totalMatch[3]);
 }
+
+export function extraerPasajeros(texto) {
+  const ssMatch = texto.match(/SS(\d+)/);
+  if (ssMatch) {
+    return parseInt(ssMatch[1]);
+  }
+  const noNameMatch = texto.match(/NO NAME\s*\(\s*(\d+)\s*\)/);
+  if (noNameMatch) {
+    return parseInt(noNameMatch[1]);
+  }
+  const totalsMatch = texto.match(/TOTALS\s+(\d+)/);
+  if (totalsMatch) {
+    return parseInt(totalsMatch[1]);
+  }
+  return 1;
+}
