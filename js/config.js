@@ -27,7 +27,7 @@ export function guardarConfiguracion() {
 }
 
 export function obtenerTA(tipo, config) {
-  return tipo === 'unico' ? config.taOneWay : config.taRoundTrip;
+  return tipo === 'tramos' ? config.taRoundTrip : config.taOneWay;
 }
 
 export function abrirConfiguracion() {
