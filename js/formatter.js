@@ -54,9 +54,10 @@ export function calcularDuracionTotal(segmentos) {
   return calcularDuracionVuelo(primeraSalida, ultimaLlegada);
 }
 
-export function generarMensaje(segmentos, tipo, equipaje, totalNumerico) {
+export function generarMensaje(segmentos, tipo, equipaje, totalNumerico, pasajeros = 1) {
   const formatoCOP = new Intl.NumberFormat('es-CO');
   const total = formatoCOP.format(totalNumerico);
+  const cantTxt = pasajeros === 1 ? 'por persona' : `para ${pasajeros} pasajeros`;
   let msg = '';
 
   if (tipo === 'unico' && segmentos.length === 1) {
@@ -73,7 +74,7 @@ export function generarMensaje(segmentos, tipo, equipaje, totalNumerico) {
       msg += `• Bodega: hasta ${equipaje.menorPeso} kg\n`;
     }
     msg += `• Artículo personal: hasta 5 kg\n\n`;
-    msg += `💰 *Total por persona*\n`;
+    msg += `💰 *Valor total ${cantTxt}*\n`;
     msg += `*$${total} COP*\n`;
     msg += `_(incluye tasas e impuestos)_\n\n`;
     msg += `⚠️ _Tarifa sujeta a cambios y disponibilidad al momento de emitir._\n\n`;
@@ -95,7 +96,7 @@ export function generarMensaje(segmentos, tipo, equipaje, totalNumerico) {
       msg += `• Bodega: hasta ${equipaje.menorPeso} kg\n`;
     }
     msg += `• Artículo personal: hasta 5 kg\n\n`;
-    msg += `💰 *Total por persona*\n`;
+    msg += `💰 *Total ${cantTxt}*\n`;
     msg += `*$${total} COP*\n`;
     msg += `_(incluye tasas e impuestos)_\n\n`;
     msg += `⚠️ _Tarifa sujeta a cambios y disponibilidad al momento de emitir._\n\n`;
@@ -112,7 +113,7 @@ export function generarMensaje(segmentos, tipo, equipaje, totalNumerico) {
       msg += `• Bodega: hasta ${equipaje.menorPeso} kg\n`;
     }
     msg += `• Artículo personal: hasta 5 kg\n\n`;
-    msg += `💰 *Total por persona*\n`;
+    msg += `💰 *Total ${cantTxt}*\n`;
     msg += `*$${total} COP*\n`;
     msg += `_(incluye tasas e impuestos)_\n\n`;
     msg += `⚠️ _Tarifa sujeta a cambios y disponibilidad al momento de emitir._\n\n`;

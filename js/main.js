@@ -1,4 +1,4 @@
-import { extraerSegmentos, detectarTipo, extraerEquipaje, extraerTotal } from './parser.js';
+import { extraerSegmentos, detectarTipo, extraerEquipaje, extraerTotal, extraerPasajeros } from './parser.js';
 import { generarMensaje } from './formatter.js';
 import {
   cargarConfiguracion,
@@ -31,6 +31,7 @@ function generarCotizacion() {
   const tipo = detectarTipo(segmentos);
   const equipaje = extraerEquipaje(texto);
   const totalNeto = extraerTotal(texto);
+  const pasajeros = extraerPasajeros(texto);
 
   if (totalNeto === 0) {
     resultado.innerText =
@@ -41,7 +42,7 @@ function generarCotizacion() {
 
   const ta = obtenerTA(tipo, config);
   const totalConTA = totalNeto + ta;
-  const mensaje = generarMensaje(segmentos, tipo, equipaje, totalConTA);
+  const mensaje = generarMensaje(segmentos, tipo, equipaje, totalConTA, pasajeros);
 
   resultado.innerText = mensaje;
   resultado.className = 'sh-result success';
