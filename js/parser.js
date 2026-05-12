@@ -35,20 +35,20 @@ export function extraerSegmentos(texto, airlineCode) {
     const dia = parseInt(diaStr);
 
     const rutasStdRegex = new RegExp(
-      `(?:^|\\n)\\s*\\d*\\s*${code}\\s+\\d+\\s+[^\\n]+\\s+([A-Z]{3})\\s+([A-Z]{3})\\s+\\d{2}:\\d{2}\\s+\\d{2}:\\d{2}`,
+      `(?:^|\\n)\\s*(?:\\d+\\s+)?${code}\\s+\\d+\\s+[^\\n]+\\s+([A-Z]{3})\\s+([A-Z]{3})\\s+\\d{2}:\\d{2}\\s+\\d{2}:\\d{2}`,
       'gm',
     );
     const todasRutas = bloque.match(rutasStdRegex);
 
     const rutasSS1Regex = new RegExp(
-      `(?:^|\\n)\\s*\\d+\\s+${code}[A-Z0-9]+\\s+\\d+[A-Z]{3}\\s+[A-Z]{2}\\s+([A-Z]{3})([A-Z]{3})\\s+SS1\\s+\\d{4}\\s+\\d{4}`,
+      `(?:^|\\n)\\s*\\d+\\s+${code}[A-Z0-9]+\\s+\\d+[A-Z]{3}\\s+[A-Z]{2}\\s+([A-Z]{3})([A-Z]{3})\\s+SS\\d+\\s+\\d{4}\\s+\\d{4}`,
       'gm',
     );
     const rutasSS1 = bloque.match(rutasSS1Regex);
 
     if (rutasSS1 && rutasSS1.length > 0) {
       const ss1MatchRegex = new RegExp(
-        `\\d+\\s+${code}[A-Z0-9]+\\s+\\d+[A-Z]{3}\\s+[A-Z]{2}\\s+([A-Z]{3})([A-Z]{3})\\s+SS1\\s+(\\d{4})\\s+(\\d{4})`,
+        `\\d+\\s+${code}[A-Z0-9]+\\s+\\d+[A-Z]{3}\\s+[A-Z]{2}\\s+([A-Z]{3})([A-Z]{3})\\s+SS\\d+\\s+(\\d{4})\\s+(\\d{4})`,
       );
       for (const ruta of rutasSS1) {
         const match = ruta.match(ss1MatchRegex);
