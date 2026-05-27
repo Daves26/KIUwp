@@ -202,11 +202,40 @@ ADT
 
 FARED: LPZ009RJV 1449/10MAY26 # WS`;
 
+const input6 = `** KIU AVAILABILITY ** TO BOG/BOGOTA, CO               WED 13MAY26
+   1   9R    8840  Y4 BC KC MC QC TC VC  LPZ   EOH     08:45   10:05   N   0 DH6 3    01:20
+                   DC XC O0 
+       9R    8766  Y5 S2 W1 BC FC HC IC  EOH   BOG     11:35   12:47   N   0 AT5 3    01:12 >4:02
+                   KC LC PC MC NC QC TC VC D1 XC 
+   2   9R    8840  Y4 BC KC MC QC TC VC  LPZ   EOH     08:45   10:05   N   0 DH6 3    01:20
+                   DC XC O0 
+       9R    8605  YC SC WC BC FC HC IC  EOH   BOG     15:43   16:55   N   0 AT5 3    01:12 >8:10
+                   KC LC PC MC NC QC TC VC DC XC 
+ 1* MORE CARRIER DISPLAY
+02Y1
+  1   9R8840Y 13MAY WE LPZEOH SS2  0845 1005
+  2   9R8766Y 13MAY WE EOHBOG SS2  1135 1247
+WS
+FARE NOT GUARANTEED UNTIL TICKETED
+
+     PASSENGER           TYPE       FARE (IN COP)          TAX        FEE       PER PSGR
+  1. NO NAME ( 2)         ADT             1140000       238600          0        1378600
+                   TOTALS   2             1140000       238600          0        1378600
+
+BAGGAGE ALLOWANCE
+ADT
+  9R    LPZMDE        2P  UP TO 10.00K
+  9R    MDEBOG        2P  UP TO 20.00K
+
+
+FARED: LPZ009RJV 1402/12MAY26 # WS`;
+
 ejecutarPrueba(1, 'ONE WAY (EOH → LPZ)', input1);
 ejecutarPrueba(2, 'ROUND TRIP (EOH → LPZ + LPZ → EOH)', input2);
 ejecutarPrueba(3, 'MÚLTIPLES TRAYECTOS (3 TRAMOS)', input3);
 ejecutarPrueba(4, 'VUELO EN CONEXIÓN (LPZ → EOH → BOG)', input4);
 ejecutarPrueba(5, '3 PASAJEROS', input5);
+ejecutarPrueba(6, '113MAYLPZBOG - 2 PASAJEROS, 2 OPCIONES DE VUELO', input6);
 
 console.log('');
 console.log('✓ TODAS LAS PRUEBAS COMPLETADAS');
