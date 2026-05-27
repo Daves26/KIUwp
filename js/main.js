@@ -1,4 +1,10 @@
-import { extraerSegmentos, detectarTipo, extraerEquipaje, extraerTotal, extraerPasajeros } from './parser.js';
+import {
+  extraerSegmentos,
+  detectarTipo,
+  extraerEquipaje,
+  extraerTotal,
+  extraerPasajeros,
+} from './parser.js';
 import { generarMensaje } from './formatter.js';
 import {
   cargarConfiguracion,
@@ -64,6 +70,25 @@ function copiarTexto() {
   });
 }
 
+function limpiarTexto() {
+  document.getElementById('inputKIU').value = '';
+  const resultado = document.getElementById('resultado');
+  resultado.innerText = 'Aquí aparecerá la cotización generada...';
+  resultado.className = 'sh-result placeholder';
+  document.getElementById('inputKIU').focus();
+}
+
+function toggleAyudaTeclado() {
+  const help = document.getElementById('keyboardHelp');
+  const isActive = help.classList.contains('active');
+  if (isActive) {
+    help.classList.remove('active');
+  } else {
+    help.classList.add('active');
+    document.getElementById('btnCerrarAyuda').focus();
+  }
+}
+
 function toggleDarkMode() {
   const html = document.documentElement;
   const current = html.getAttribute('data-theme');
@@ -96,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btnCerrarConfig').addEventListener('click', cerrarConfiguracion);
   document.getElementById('btnGuardarConfig').addEventListener('click', () => {
     guardarConfiguracion();
-    // re-generate with new config if there's text
     const texto = document.getElementById('inputKIU').value.trim();
     if (texto) {
       generarCotizacion();
@@ -107,11 +131,68 @@ document.addEventListener('DOMContentLoaded', () => {
       cerrarConfiguracion();
     }
   });
+
+  document.getElementById('btnGenerar').addEventListener('click', generarCotizacion);
+  document.getElementById('btnCopiar').addEventListener('click', copiarTexto);
+  document.getElementById('btnAyuda').addEventListener('click', toggleAyudaTeclado);
+  document.getElementById('btnCerrarAyuda').addEventListener('click', toggleAyudaTeclado);
+  document.getElementById('keyboardHelp').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('keyboardHelp')) {
+      toggleAyudaTeclado();
+    }
+  });
+
   document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById('configModal');
+    const helpModal = document.getElementById('keyboardHelp');
+    const textarea = document.getElementById('inputKIU');
+    const target = e.target;
+    const mod = e.ctrlKey || e.metaKey;
+
     if (e.key === 'Escape') {
-      const modal = document.getElementById('configModal');
       if (modal.classList.contains('active')) {
         cerrarConfiguracion();
+        return;
+      }
+      if (helpModal.classList.contains('active')) {
+        toggleAyudaTeclado();
+        return;
+      }
+      if (target === textarea) {
+        textarea.blur();
+      }
+      return;
+    }
+
+    if (modal.classList.contains('active') || helpModal.classList.contains('active')) {
+      return;
+    }
+
+    if (mod && e.key === 'Enter') {
+      e.preventDefault();
+      generarCotizacion();
+      return;
+    }
+
+    if (mod && e.shiftKey && (e.key === 'X' || e.key === 'x')) {
+      e.preventDefault();
+      limpiarTexto();
+      return;
+    }
+
+    if (e.key === '?' && !mod && !e.altKey) {
+      if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        toggleAyudaTeclado();
+        return;
+      }
+    }
+
+    if (e.key === '/' && !mod && !e.altKey) {
+      if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        textarea.focus();
+        return;
       }
     }
   });
@@ -124,3 +205,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.generarCotizacion = generarCotizacion;
 window.copiarTexto = copiarTexto;
+window.limpiarTexto = limpiarTexto;
+window.toggleAyudaTeclado = toggleAyudaTeclado;

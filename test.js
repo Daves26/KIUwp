@@ -1,4 +1,10 @@
-import { extraerSegmentos, detectarTipo, extraerEquipaje, extraerTotal, extraerPasajeros } from './js/parser.js';
+import {
+  extraerSegmentos,
+  detectarTipo,
+  extraerEquipaje,
+  extraerTotal,
+  extraerPasajeros,
+} from './js/parser.js';
 import { generarMensaje } from './js/formatter.js';
 import { obtenerTA } from './js/config.js';
 
