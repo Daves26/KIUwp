@@ -10,7 +10,6 @@ import {
   cargarConfiguracion,
   guardarConfiguracion,
   obtenerTA,
-  abrirConfiguracion,
   cerrarConfiguracion,
 } from './config.js';
 
@@ -117,7 +116,6 @@ function registrarSW() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('btnConfig').addEventListener('click', abrirConfiguracion);
   document.getElementById('btnCerrarConfig').addEventListener('click', cerrarConfiguracion);
   document.getElementById('btnGuardarConfig').addEventListener('click', () => {
     guardarConfiguracion();
