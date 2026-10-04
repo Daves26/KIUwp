@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#c7c7c7" />
+    <meta name="theme-color" content="#343434" />
     <title>Cotizador KIU → WhatsApp</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
@@ -14,6 +14,10 @@
   <body>
     <div class="sh-wrap">
       <div class="sh-hero">
+        <div class="sh-window-title">
+          <span class="sh-window-mark" aria-hidden="true">&gt;_</span>
+          <h1>Cotizador KIU</h1>
+        </div>
         <div class="sh-hero-actions">
           <button
             class="btn-icon"
@@ -73,13 +77,16 @@
             </svg>
           </button>
         </div>
-        <h1>Cotizador KIU</h1>
-        <p>Pegue el texto copiado desde KIU para generar su cotización al instante.</p>
+      </div>
+
+      <div class="sh-intro">
+        <span class="sh-intro-tag">KIU / WHATSAPP</span>
+        <p>Pegue el texto de KIU y genere su cotización.</p>
       </div>
 
       <div class="sh-body">
         <div class="sh-panel-left">
-          <label class="sh-label" for="inputKIU">Texto de KIU</label>
+          <label class="sh-label" for="inputKIU"><span>01 / ENTRADA</span> Texto de KIU</label>
           <textarea
             class="sh-textarea"
             id="inputKIU"
@@ -93,10 +100,8 @@
           </div>
         </div>
 
-        <div class="sh-divider"></div>
-
         <div class="sh-panel-right">
-          <div class="sh-result-label"><span class="accent-dot"></span>Resultado</div>
+          <div class="sh-result-label"><span>02 / SALIDA</span> Resultado</div>
           <div class="sh-result placeholder" id="resultado" aria-live="polite">
             Aquí aparecerá la cotización generada...
           </div>
@@ -112,7 +117,10 @@
         </div>
       </div>
 
-      <div class="sh-footer"></div>
+      <div class="sh-footer">
+        <span><span class="sh-status-light" aria-hidden="true"></span> LISTO</span>
+        <span>CTRL + ENTER &nbsp;·&nbsp; GENERAR</span>
+      </div>
     </div>
 
     <div
@@ -124,7 +132,7 @@
     >
       <div class="sh-config-panel">
         <div class="sh-config-header">
-          <h2 id="configTitle">⚙️ Configuración</h2>
+          <h2 id="configTitle">Configuración</h2>
           <button class="sh-config-close" id="btnCerrarConfig" aria-label="Cerrar configuración">
             ✕
           </button>

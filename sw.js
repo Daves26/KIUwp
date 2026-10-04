@@ -1,4 +1,4 @@
-const CACHE = 'kiuwp-v1';
+const CACHE = 'kiuwp-v2';
 
 const STATIC_ASSETS = [
   './',
