@@ -298,6 +298,10 @@ button {
   opacity: 1;
 }
 
+.sh-result.placeholder {
+  white-space: normal;
+}
+
 .sh-textarea:focus {
   outline: 1px dotted var(--ink);
   outline-offset: 3px;
